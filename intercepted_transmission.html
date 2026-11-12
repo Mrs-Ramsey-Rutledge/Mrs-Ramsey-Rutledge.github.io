@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a1118">
+  <title>Recovered Transmission // 04-27</title>
+  <style>
+    :root {
+      --bg: #080e14;
+      --panel: #101a23;
+      --panel2: #14222d;
+      --line: #29404d;
+      --green: #70e0a0;
+      --green-dim: #3e9e70;
+      --amber: #efbd68;
+      --text: #dce7e9;
+      --muted: #8ca0a8;
+      --red: #e47777;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 32px 18px;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 50% -20%, #1b3542 0%, transparent 55%),
+        repeating-linear-gradient(0deg, rgba(112,224,160,.025) 0, rgba(112,224,160,.025) 1px, transparent 1px, transparent 4px),
+        var(--bg);
+      font-family: Consolas, "Courier New", monospace;
+    }
+    .shell { width: min(820px, 100%); margin: 0 auto; }
+    .topline {
+      display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      color: var(--muted); font-size: 11px; letter-spacing: .14em;
+      margin: 0 0 12px;
+    }
+    .window {
+      border: 1px solid var(--line);
+      background: rgba(12, 21, 29, .96);
+      box-shadow: 0 22px 70px rgba(0,0,0,.45), 0 0 35px rgba(77,181,130,.06);
+    }
+    .windowbar {
+      display: flex; align-items: center; gap: 7px;
+      padding: 12px 16px; background: #14232d; border-bottom: 1px solid var(--line);
+    }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #52636a; }
+    .windowtitle { margin-left: 9px; color: #a9bdc2; font-size: 11px; letter-spacing: .12em; }
+    main { padding: clamp(20px, 5vw, 42px); }
+    .status {
+      display: inline-flex; align-items: center; gap: 9px;
+      color: var(--green); border: 1px solid var(--green-dim);
+      background: rgba(62,158,112,.10); padding: 8px 11px;
+      font-size: 11px; letter-spacing: .12em; font-weight: bold;
+    }
+    .pulse {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+      box-shadow: 0 0 10px var(--green); animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 50% { opacity: .35; box-shadow: 0 0 2px var(--green); } }
+    h1 {
+      margin: 23px 0 8px; font-size: clamp(27px, 6vw, 43px);
+      line-height: 1.08; letter-spacing: .035em; color: #f0f6f4;
+    }
+    .subtitle { color: var(--muted); font-size: 12px; letter-spacing: .12em; line-height: 1.8; }
+    .rule { height: 1px; background: linear-gradient(90deg, var(--green-dim), var(--line), transparent); margin: 27px 0; }
+    .section-label { color: var(--green); font-size: 11px; letter-spacing: .16em; margin-bottom: 12px; }
+    .message {
+      color: #c6d5d8; line-height: 1.8; font-size: 14px;
+      border-left: 2px solid var(--green-dim); padding: 2px 0 2px 17px;
+    }
+    .message strong { color: #f0f6f4; }
+    .attachments { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+    .file {
+      display: flex; flex-direction: column; min-height: 145px;
+      padding: 17px; border: 1px solid var(--line); background: var(--panel);
+      text-decoration: none; color: var(--text); transition: border-color .18s, background .18s, transform .18s;
+    }
+    .file:hover { border-color: var(--green-dim); background: var(--panel2); transform: translateY(-2px); }
+    .filetop { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .fileicon { color: var(--amber); font-size: 21px; }
+    .tag { color: var(--amber); font-size: 9px; letter-spacing: .12em; border: 1px solid #725b36; padding: 4px 6px; }
+    .filename { margin-top: 17px; font-size: 15px; color: #eff6f4; font-weight: bold; overflow-wrap: anywhere; }
+    .filedesc { margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .download { margin-top: auto; padding-top: 15px; color: var(--green); font-size: 10px; letter-spacing: .1em; }
+    .warning {
+      margin-top: 22px; padding: 14px 16px; border: 1px solid #665333;
+      background: rgba(239,189,104,.06); color: #d8c39e; font-size: 11px; line-height: 1.8;
+    }
+    .warning strong { color: var(--amber); letter-spacing: .1em; }
+    .metadata {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+      margin-top: 25px; padding-top: 19px; border-top: 1px solid var(--line);
+    }
+    .meta-label { color: var(--muted); font-size: 9px; letter-spacing: .13em; }
+    .meta-value { color: #c9d8da; font-size: 11px; margin-top: 7px; }
+    footer {
+      display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      color: #61747c; font-size: 9px; letter-spacing: .1em; padding: 15px 2px 0;
+    }
+    .error { display:none; color: var(--red); font-size: 11px; margin-top: 12px; }
+    @media (max-width: 560px) {
+      .attachments { grid-template-columns: 1fr; }
+      .metadata { grid-template-columns: 1fr; gap: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topline">
+      <span>UNCLASSIFIED // RECOVERED MATERIAL</span>
+      <span>NODE 04-27 &nbsp;|&nbsp; INBOUND</span>
+    </div>
+
+    <div class="window">
+      <div class="windowbar" aria-label="Transmission window">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="windowtitle">RECOVERY_TERMINAL / TRANSMISSION_VIEWER</span>
+      </div>
+
+      <main>
+        <div class="status"><span class="pulse"></span> TRANSMISSION RECOVERED</div>
+        <h1>INTERCEPTED<br>DATA STREAM</h1>
+        <div class="subtitle">SOURCE: UNKNOWN &nbsp; // &nbsp; INTEGRITY: PARTIAL<br>RECOVERY STATUS: 2 ATTACHMENTS FOUND</div>
+
+        <div class="rule"></div>
+
+        <div class="section-label">[ RECOVERED MESSAGE ]</div>
+        <div class="message">
+          Two encrypted files were recovered from the previous operator's workspace.
+          The files appear to contain information needed to continue the investigation.
+          <br><br>
+          Both attachments were encrypted using the <strong>same block cipher protocol</strong>
+          encountered in the previous stage. The encryption key has not changed.
+          <br><br>
+          The contents of the first file may explain the purpose of the second. Recover
+          both files before proceeding.
+        </div>
+
+        <div class="rule"></div>
+
+        <div class="section-label">[ RECOVERED ATTACHMENTS ]</div>
+        <div class="attachments">
+          <a class="file" href="instructions.enc" download>
+            <div class="filetop">
+              <span class="fileicon">▣</span>
+              <span class="tag">ENCRYPTED</span>
+            </div>
+            <div class="filename">instructions.enc</div>
+            <div class="filedesc">Recovered instruction packet<br>Format: encrypted text</div>
+            <div class="download">↓ DOWNLOAD ATTACHMENT</div>
+          </a>
+
+          <a class="file" href="archive.enc" download>
+            <div class="filetop">
+              <span class="fileicon">▤</span>
+              <span class="tag">ENCRYPTED</span>
+            </div>
+            <div class="filename">archive.enc</div>
+            <div class="filedesc">Recovered data archive<br>Format: encrypted text</div>
+            <div class="download">↓ DOWNLOAD ATTACHMENT</div>
+          </a>
+        </div>
+
+        <div class="warning">
+          <strong>⚠ RECOVERY NOTICE</strong><br>
+          Do not attempt to interpret the attachments until they have been decrypted.
+          Preserve the original files. Both files are expected to use the previously
+          recovered key and block-processing rules.
+        </div>
+
+        <div class="metadata">
+          <div><div class="meta-label">TRANSMISSION ID</div><div class="meta-value">TR-04-27-B</div></div>
+          <div><div class="meta-label">ATTACHMENTS</div><div class="meta-value">02 DETECTED</div></div>
+          <div><div class="meta-label">CHANNEL STATUS</div><div class="meta-value">DORMANT</div></div>
+        </div>
+      </main>
+    </div>
+
+    <footer>
+      <span>RECOVERY TERMINAL // ARCHIVE DIVISION</span>
+      <span>END OF TRANSMISSION</span>
+    </footer>
+  </div>
+</body>
+</html>
